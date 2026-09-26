@@ -30,5 +30,6 @@
 
 ```bash
 grep -o '^[^:]*' /etc/passwd | sort
+```
 
 ![Результат выполнения задания 1](images/task1.png)
