@@ -303,3 +303,91 @@ print("Hello")
 **Результат:**
 
 ![Результат выполнения задания 6](images/task6.png)
+
+### Задание 7
+
+**Условие:**
+
+Написать программу для поиска файлов-дубликатов по заданному пути, включая вложенные директории.
+
+**Ход выполнения:**
+
+Для решения задачи был создан Bash-скрипт `duplicates`:
+
+```bash
+nano duplicates
+```
+
+В файл был записан следующий код:
+
+```bash
+#!/bin/bash
+
+if [ "$#" -ne 1 ]; then
+    echo "Использование: $0 <путь>"
+    exit 1
+fi
+
+path="$1"
+
+if [ ! -d "$path" ]; then
+    echo "Ошибка: директория не найдена"
+    exit 1
+fi
+
+find "$path" -type f -exec sha256sum {} + | sort | awk '
+{
+    hash=$1
+    $1=""
+    sub(/^ /, "")
+    files[hash]=files[hash] "\n" $0
+    count[hash]++
+}
+END {
+    for (hash in count) {
+        if (count[hash] > 1) {
+            print "Дубликаты:"
+            print files[hash]
+            print ""
+        }
+    }
+}'
+```
+
+После сохранения скрипту было добавлено право на выполнение:
+
+```bash
+chmod +x duplicates
+```
+
+Для проверки была создана тестовая директория:
+
+```bash
+mkdir -p test_duplicates
+```
+
+В неё были добавлены три файла:
+
+```bash
+echo "different" > test_duplicates/a.txt
+echo "hello" > test_duplicates/b.txt
+echo "hello" > test_duplicates/c.txt
+```
+
+Содержимое файлов:
+
+```text
+a.txt -> different
+b.txt -> hello
+c.txt -> hello
+```
+
+После этого программа была запущена командой:
+
+```bash
+./duplicates test_duplicates
+```
+
+**Результат:**
+
+![Результат выполнения задания 7](images/task7.png)
